@@ -491,6 +491,20 @@ html[data-theme="orange"] body .result-card figcaption,html[data-theme="violet"]
   .orb{animation-duration:26s}
 }
 
+/* ============================================================
+   v16 MOBILE LITE (2026-10-21): frame-drop fix — animations were
+   skipping frames on phones (heavy blur + backdrop-filter), so
+   they LOOKED fast/jumpy. Mobile: no card blur, no reveal blur,
+   particles hidden (JS also stops them). PC unchanged.
+   ============================================================ */
+@media(max-width:900px){
+  #particles{display:none}
+  .reveal-adv{filter:none!important;transform:translateY(26px) scale(.98);will-change:opacity,transform}
+  .reveal-adv.visible{transform:none}
+  body .exp-card,body .service-card,body .who-card,body .tool-box,body .step,body .faq-item,body .contact-info div,body .about-points div,body .blog-card,body .stat,body .earn-strip div,body form,body .bv-window,body .float-card,body .result-card figcaption,body .hero-tags span,body .badge,body .seo-kw span{
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+}
+
 </style>
 <style id="themeStyle"></style>
 <script>
@@ -819,6 +833,7 @@ document.addEventListener('click',e=>{
 </div>
 <button id="toTop" aria-label="Back to top">↑</button>
 <script>
+const LITE=matchMedia('(max-width:900px)').matches||matchMedia('(pointer:coarse)').matches;
 // ===== Expertise data (accurate to brief) =====
 const expertise=[
  {i:"🚀",t:"SEO & AEO Specialist",p:"Full SEO plus optimisation for AI-powered answers — get found and cited everywhere people search.",items:["On-page, technical & off-page SEO","AEO: answer-ready content","GEO: visibility in AI results"]},
@@ -861,7 +876,7 @@ menuBtn.onclick=()=>{navMenu.classList.toggle('open');menuBtn.textContent=navMen
 navMenu.querySelectorAll('a').forEach(a=>a.onclick=()=>navMenu.classList.remove('open'));
 
 // ===== 3D tilt + spotlight =====
-function addTilt(el){el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;el.style.setProperty('--mx',(x*100)+'%');el.style.setProperty('--my',(y*100)+'%');el.style.transform=`perspective(900px) rotateY(${(x-.5)*10}deg) rotateX(${(.5-y)*10}deg) translateY(-6px)`});el.addEventListener('mouseleave',()=>el.style.transform='')}
+function addTilt(el){if(LITE)return;el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;el.style.setProperty('--mx',(x*100)+'%');el.style.setProperty('--my',(y*100)+'%');el.style.transform=`perspective(900px) rotateY(${(x-.5)*10}deg) rotateX(${(.5-y)*10}deg) translateY(-6px)`});el.addEventListener('mouseleave',()=>el.style.transform='')}
 document.querySelectorAll('[data-tilt]').forEach(addTilt);
 const hero=document.getElementById('tiltHero');
 if(hero&&matchMedia('(pointer:fine)').matches){hero.addEventListener('mousemove',e=>{const r=hero.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;hero.style.transform=`perspective(1100px) rotateY(${x*7}deg) rotateX(${-y*7}deg)`});hero.addEventListener('mouseleave',()=>hero.style.transform='')}
@@ -872,14 +887,14 @@ if(matchMedia('(pointer:fine)').matches){document.querySelectorAll('.magnetic').
 // ===== Custom cursor =====
 const dot=document.querySelector('.cursor-dot'),ring=document.querySelector('.cursor-ring');let mx=0,my=0,rx=0,ry=0;
 addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
-(function cursor(){rx+=(mx-rx)*.14;ry+=(my-ry)*.14;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(cursor)})();
+(function cursor(){if(LITE)return;rx+=(mx-rx)*.14;ry+=(my-ry)*.14;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(cursor)})();
 document.querySelectorAll('a,button,.chips span').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('hovering'));el.addEventListener('mouseleave',()=>ring.classList.remove('hovering'))});
 
 // ===== Particles canvas =====
 const cv=document.getElementById('particles'),ctx=cv.getContext('2d');let W,H,pts=[];
 function resize(){W=cv.width=cv.offsetWidth;H=cv.height=cv.offsetHeight;pts=Array.from({length:Math.min(80,W/14)},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.45,vy:(Math.random()-.5)*.45,r:Math.random()*1.8+.4}))}
 resize();addEventListener('resize',resize);
-(function draw(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fillStyle='rgba(233,201,121,.65)';ctx.fill()});
+(function draw(){if(LITE){cv.style.display='none';return}ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fillStyle='rgba(233,201,121,.65)';ctx.fill()});
  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const a=pts[i],b=pts[j],d=Math.hypot(a.x-b.x,a.y-b.y);if(d<120){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(56,225,198,${(1-d/120)*.16})`;ctx.stroke()}}
  requestAnimationFrame(draw)})();
 
