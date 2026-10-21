@@ -480,6 +480,17 @@ html[data-theme="orange"] body .result-card figcaption,html[data-theme="violet"]
     -webkit-backdrop-filter:blur(9px) saturate(140%);backdrop-filter:blur(9px) saturate(140%)}
 }
 
+/* ============================================================
+   v15 (2026-10-21): social icons CENTER on mobile (left on PC);
+   mobile transitions slowed further
+   ============================================================ */
+@media(max-width:760px){
+  .hero-socials{justify-content:center!important}
+  .reveal{transition:opacity 1.4s ease,transform 1.4s cubic-bezier(.22,1,.36,1)}
+  .reveal-adv{transition:opacity 1.45s ease,transform 1.5s cubic-bezier(.16,1,.3,1),filter 1.45s ease,box-shadow .4s ease}
+  .orb{animation-duration:26s}
+}
+
 </style>
 <style id="themeStyle"></style>
 <script>
@@ -829,9 +840,9 @@ window.addEventListener('load',()=>setTimeout(()=>document.getElementById('prelo
 const words=["SEO & AEO.","Blogging.","Off-Page SEO.","Website Ranking.","WordPress Design.","Custom Websites.","Site Monetization."];
 let wi=0,ci=0,del=false;const typed=document.getElementById('typed');
 (function type(){const w=words[wi];typed.textContent=w.slice(0,ci);
- if(!del){ci++;if(ci>w.length){del=true;return setTimeout(type,innerWidth<760?2000:1500)}}
+ if(!del){ci++;if(ci>w.length){del=true;return setTimeout(type,innerWidth<900?2000:1500)}}
  else{ci--;if(ci===0){del=false;wi=(wi+1)%words.length}}
- setTimeout(type,del?(innerWidth<760?65:38):(innerWidth<760?125:82))})();
+ setTimeout(type,del?(innerWidth<900?65:38):(innerWidth<900?125:82))})();
 
 // ===== Scroll: nav, progress, toTop, reveal =====
 const nav=document.getElementById('navbar'),bar=document.getElementById('progressBar'),toTop=document.getElementById('toTop');
@@ -888,8 +899,8 @@ addEventListener('scroll',()=>{document.querySelector('.orb1').style.translate=`
 
 // ===== Animated counters =====
 const cio=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;cio.unobserve(e.target);
- const target=parseFloat(e.target.dataset.target),dec=parseInt(e.target.dataset.dec||0),t0=performance.now();
- (function tick(t){const p=Math.min((t-t0)/1700,1),ease=1-Math.pow(1-p,3);e.target.textContent=(target*ease).toFixed(dec);if(p<1)requestAnimationFrame(tick)})(t0);
+ const target=parseFloat(e.target.dataset.target),dec=parseInt(e.target.dataset.dec||0),t0=performance.now(),DUR=(innerWidth<900?2600:1600);
+ (function tick(t){const p=Math.min((t-t0)/DUR,1),ease=1-Math.pow(1-p,3);e.target.textContent=(target*ease).toFixed(dec);if(p<1)requestAnimationFrame(tick)})(t0);
 }),{threshold:.5});
 document.querySelectorAll('.counter').forEach(el=>cio.observe(el));
 // ===== Results lightbox =====
